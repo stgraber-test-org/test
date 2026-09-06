@@ -1,0 +1,16 @@
+name: Runner accounting test
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  wait:
+    runs-on: [self-hosted, test]
+    steps:
+      - name: Report the runner
+        run: |
+          echo "Running on $(hostname) ($(uname -m))"
+          cat /etc/os-release | head -2
+      - name: Wait five minutes
+        run: sleep 300
