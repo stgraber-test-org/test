@@ -1,16 +1,52 @@
-name: Runner accounting test
+name: Runner images
 
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  wait:
-    runs-on: [self-hosted, test]
+  smoke:
+    name: ${{ matrix.name }}
+    runs-on: [self-hosted, test, "${{ matrix.arch }}", "${{ matrix.image }}"]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: almalinux-10-amd64, image: image-almalinux-10, arch: arch-amd64 }
+          - { name: almalinux-9-amd64, image: image-almalinux-9, arch: arch-amd64 }
+          - { name: archlinux-current-amd64, image: image-archlinux-current, arch: arch-amd64 }
+          - { name: centos-10-Stream-amd64, image: image-centos-10-stream, arch: arch-amd64 }
+          - { name: centos-9-Stream-amd64, image: image-centos-9-stream, arch: arch-amd64 }
+          - { name: debian-13-amd64, image: image-debian-13, arch: arch-amd64 }
+          - { name: debian-13-arm64, image: image-debian-13, arch: arch-arm64 }
+          - { name: debian-12-amd64, image: image-debian-12, arch: arch-amd64 }
+          - { name: debian-12-arm64, image: image-debian-12, arch: arch-arm64 }
+          - { name: fedora-44-amd64, image: image-fedora-44, arch: arch-amd64 }
+          - { name: fedora-44-arm64, image: image-fedora-44, arch: arch-arm64 }
+          - { name: fedora-43-amd64, image: image-fedora-43, arch: arch-amd64 }
+          - { name: fedora-43-arm64, image: image-fedora-43, arch: arch-arm64 }
+          - { name: openeuler-24.03-amd64, image: image-openeuler-24.03, arch: arch-amd64 }
+          - { name: rockylinux-10-amd64, image: image-rockylinux-10, arch: arch-amd64 }
+          - { name: rockylinux-9-amd64, image: image-rockylinux-9, arch: arch-amd64 }
+          - { name: ubuntu-26.04-amd64, image: image-ubuntu-26.04, arch: arch-amd64 }
+          - { name: ubuntu-26.04-arm64, image: image-ubuntu-26.04, arch: arch-arm64 }
+          - { name: ubuntu-24.04-amd64, image: image-ubuntu-24.04, arch: arch-amd64 }
+          - { name: ubuntu-24.04-arm64, image: image-ubuntu-24.04, arch: arch-arm64 }
+          - { name: ubuntu-22.04-amd64, image: image-ubuntu-22.04, arch: arch-amd64 }
+          - { name: ubuntu-22.04-arm64, image: image-ubuntu-22.04, arch: arch-arm64 }
     steps:
-      - name: Report the runner
+      - name: Identify the runner
         run: |
-          echo "Running on $(hostname) ($(uname -m))"
-          cat /etc/os-release | head -2
-      - name: Wait five minutes
-        run: sleep 300
+          . /etc/os-release && echo "$PRETTY_NAME on $(uname -m), kernel $(uname -r)"
+          nproc; free -h | sed -n 2p; df -h / | sed -n 2p
+      - name: Check the tools a job needs
+        run: |
+          for tool in git curl tar gzip sudo; do command -v "$tool" >/dev/null || { echo "missing: $tool"; exit 1; }; done
+          sudo -n true && echo "sudo works"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node-based action
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --version
