@@ -24,7 +24,6 @@ jobs:
           - { name: fedora-44-amd64, image: image-fedora-44, arch: arch-amd64 }
           - { name: fedora-44-arm64, image: image-fedora-44, arch: arch-arm64 }
           - { name: fedora-43-amd64, image: image-fedora-43, arch: arch-amd64 }
-          - { name: fedora-43-arm64, image: image-fedora-43, arch: arch-arm64 }
           - { name: openeuler-24.03-amd64, image: image-openeuler-24.03, arch: arch-amd64 }
           - { name: opensuse-16.0-amd64, image: image-opensuse-16.0, arch: arch-amd64 }
           - { name: opensuse-16.0-arm64, image: image-opensuse-16.0, arch: arch-arm64 }
